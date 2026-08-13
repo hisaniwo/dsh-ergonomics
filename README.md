@@ -20,24 +20,29 @@ DSH 会话人体工学 —— 一组提升 **DSH（DeepSeek Harness）** 日常�
 
 ## 安装
 
-### 1. 安装包
+### 1. 安装到 web profile
 
 ```bash
-npm install dsh-ergonomics
+dsh plugin --profile web add dsh-ergonomics
 ```
 
-> 包需要能被 DSH 进程解析到（装到 DSH 部署的 node_modules 中，或本地 `npm link`）。
+> 该命令把包装进 profile 的依赖（转发给 pnpm）。若 pnpm 配了镜像源，刚发布的包可能需几分钟同步；必要时加 `--registry https://registry.npmjs.org/`。
 
-### 2. 在组合中注册
+### 2. 在 patch 层注册
 
-在 DSH 的 host 组合（`cordis.yml`）里加一行：
+编辑 `$DSH_HOME/profiles/web/cordis.patch.yml`（默认 `~/.dsh/profiles/web/cordis.patch.yml`），把内容写成：
 
 ```yaml
-- id: dsh-ergonomics
-  name: dsh-ergonomics
+- insert:
+    - id: dsh-ergonomics
+      name: dsh-ergonomics
 ```
 
-### 3. 重启 DSH
+### 3. 重启
+
+```bash
+dsh web
+```
 
 插件集合的变更在进程重启后生效。
 
