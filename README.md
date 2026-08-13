@@ -2,7 +2,7 @@
 
 DSH 会话人体工学 —— 一组提升 **DSH（DeepSeek Harness）** 日常会话体验的小改进。
 
-> Ergonomics（人体工学）：让工具更顺手、更符合直觉的体验优化集合。后续可继续往里加入更多 UX 改进。
+> Ergonomics（人体工学）：让工具更顺手、更符合直觉的体验优化集合。后续可继续加入更多 UX 改进。
 
 ## 功能
 
@@ -18,6 +18,29 @@ DSH 会话人体工学 —— 一组提升 **DSH（DeepSeek Harness）** 日常�
 - **按会话隔离**：每个会话独立维护历史。
 - **刷新不丢**：历史从会话轨迹重建，页面刷新后依然可用。
 
+## 安装
+
+### 1. 安装包
+
+```bash
+npm install dsh-ergonomics
+```
+
+> 包需要能被 DSH 进程解析到（装到 DSH 部署的 node_modules 中，或本地 `npm link`）。
+
+### 2. 在组合中注册
+
+在 DSH 的 host 组合（`cordis.yml`）里加一行：
+
+```yaml
+- id: dsh-ergonomics
+  name: dsh-ergonomics
+```
+
+### 3. 重启 DSH
+
+插件集合的变更在进程重启后生效。
+
 ## 目录结构
 
 ```
@@ -25,32 +48,29 @@ dsh-ergonomics/
 ├── package.json
 ├── README.md
 ├── LICENSE
-└── src/
-    ├── index.js    # Host 半区：注册 /new 命令
-    └── client.js   # Client 半区：↑↓ 历史 + /new 跳转
+└── lib/
+    ├── index.js    # Host 半区：注册 /new 命令（ESM 插件对象）
+    └── client.js   # Client 半区：↑↓ 历史 + /new 跳转（web 模块加载器 bundle）
 ```
 
 ## 工作原理
 
-- **Host（`src/index.js`）**：注册 `/new` 命令，命令本身只返回 `success` 结果。
-- **Client（`src/client.js`）**：
+- **Host（`lib/index.js`）**：注册 `/new` 命令，命令本身只返回 `success` 结果。
+- **Client（`lib/client.js`）**：
   - 监听输入框的 `↑`/`↓`，按会话维护历史（最多 50 条）。
   - 在 `/new` 命令卡片渲染时调用 `workspaces.startSession()`，完成真正的新建并切换会话。
 
-## 使用方式
+### 包的加载约定
 
-### 方式一：作为动态 Cordis 插件加载（当前已验证的路径）
+DSH 运行时会扫描组合里的包，读取 `package.json` 的 `dsh.client` 声明与 `exports["./client"]`，把该文件当作 `window.__ModuleLoader__.load({...})` 模块加载：
 
-这是本项目代码当前最直接的运行方式。通过 DSH 的动态插件能力，把 Host 半区与 Client 半区分别作为插件代码加载：
+- `dsh.client.platform: "web"` 标记这是一个 web 客户端半区。
+- `dsh.client.inject` 声明它依赖的其他客户端包（本插件依赖 `@deepseek-ai/dsh-client-runtime`，其提供 `slots` 与 `workspaces` 服务）。
+- `lib/client.js` 的工厂函数返回 `{ inject, apply }` 插件对象，`require("react")` 取得 React。
 
-- **Host 代码**：`src/index.js` 中 `name`/`inject`/`apply` 的内容，包装成 `return { name, inject, apply }`。
-- **Client 代码**：`src/client.js` 中 `inject`/`apply` 的内容，包装成 `return { inject, apply }`（`React` 与 `styles` 由 DSH 客户端运行时注入）。
+## 作为动态插件使用（可选）
 
-> 两个半区同属一个插件实例：Host 负责注册命令，Client 负责输入历史与新会话跳转。
-
-### 方式二：作为 npm 包安装（Roadmap）
-
-DSH 通过 `cordis.yml` 组合加载插件。将本包发布为 npm 包后，可像其他 `@deepseek-ai/dsh-*` 插件一样被组合引用。当前 `package.json` 已按 DSH 插件的 Host/Client 拆分约定声明了 `exports`（`"."` 指向 Host，`"./client"` 指向 Client），并声明了所需的 `peerDependencies`。客户端半区的模块加载器打包属于后续工作。
+不安装包、临时运行时，也可把 `lib/index.js` 的 `apply`/`inject`/`name` 与 `lib/client.js` 的 `apply`/`inject` 分别作为 DSH 动态插件的 Host/Client 代码加载。注意动态环境下 `React` 是环境注入的符号（无需 `require`），CSS 用运行时的 `styles.insert(...)` 注入。
 
 ## 许可证
 

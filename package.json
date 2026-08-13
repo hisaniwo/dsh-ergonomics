@@ -3,14 +3,22 @@
   "version": "0.1.0",
   "description": "DSH 会话人体工学：/new 一键新会话 + 输入历史 ↑↓ 回溯",
   "type": "module",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "exports": {
-    ".": "./src/index.js",
-    "./client": "./src/client.js",
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
     "./package.json": "./package.json"
   },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime"
+      ]
+    }
+  },
   "files": [
-    "src",
+    "lib",
     "README.md",
     "LICENSE"
   ],
@@ -31,7 +39,10 @@
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
     "@deepseek-ai/dsh-commands": "^0.1.0-rc.6",
-    "@deepseek-ai/dsh-client-ui-slots": "^0.1.0-rc.6",
-    "@deepseek-ai/dsh-client-ui-workspace": "^0.1.0-rc.6"
+    "@deepseek-ai/dsh-client-runtime": "^0.1.0-rc.6",
+    "react": ">=18.0.0"
+  },
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/client.js"
   }
 }
