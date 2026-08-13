@@ -18,6 +18,11 @@ DSH 会话人体工学 —— 一组提升 **DSH（DeepSeek Harness）** 日常�
 - **按会话隔离**：每个会话独立维护历史。
 - **刷新不丢**：历史从会话轨迹重建，页面刷新后依然可用。
 
+### 3. `Ctrl+C` 终止当前会话
+
+- 焦点在输入框、且**没有选中任何文字**时，按 `Ctrl+C` 立即结束（归档）当前会话，回到新会话视图。
+- 若已选中文字，`Ctrl+C` 仍是普通"复制"，不会被拦截。
+
 ## 安装
 
 ### 1. 安装到 web profile
@@ -63,7 +68,7 @@ dsh-ergonomics/
 ├── LICENSE
 └── lib/
     ├── index.js    # Host 半区：注册 /new 命令（ESM 插件对象）
-    └── client.js   # Client 半区：↑↓ 历史 + /new 跳转（web 模块加载器 bundle）
+    └── client.js   # Client 半区：↑↓ 历史 + /new 跳转 + Ctrl+C 终止会话（web 模块加载器 bundle）
 ```
 
 ## 工作原理
@@ -72,6 +77,7 @@ dsh-ergonomics/
 - **Client（`lib/client.js`）**：
   - 监听输入框的 `↑`/`↓`，按会话维护历史（最多 50 条）。
   - 在 `/new` 命令卡片渲染时调用 `workspaces.startSession()`，完成真正的新建并切换会话。
+  - 在输入框无选中文字时监听 `Ctrl+C`，调用 `workspaces.archiveSession()` 终止当前会话。
 
 ### 包的加载约定
 
