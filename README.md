@@ -46,6 +46,14 @@ dsh web
 
 插件集合的变更在进程重启后生效。
 
+## 卸载
+
+```bash
+dsh plugin --profile web remove dsh-ergonomics
+```
+
+再删掉 `cordis.patch.yml` 里对应的 `insert` 段，重启 `dsh web` 即完全移除。
+
 ## 目录结构
 
 ```
