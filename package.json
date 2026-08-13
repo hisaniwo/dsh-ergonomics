@@ -1,6 +1,6 @@
 {
   "name": "dsh-ergonomics",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DSH 会话人体工学：/new 一键新会话 + 输入历史 ↑↓ 回溯",
   "type": "module",
   "main": "lib/index.js",
