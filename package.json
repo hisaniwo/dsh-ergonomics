@@ -34,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hisaniwo/dsh-ergonomics.git"
+    "url": "git+https://github.com/hisaniwo/dsh-ergonomics.git"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
