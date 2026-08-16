@@ -24,6 +24,12 @@ DSH 会话人体工学 —— 一组提升 **DSH（DeepSeek Harness）** 日常�
 - 焦点在输入框、且当前会话**正在生成**时，按 `Esc` 立即中断（停止）本次生成 —— 对应 CLI 里的 `Ctrl+C`。
 - 没有生成运行时，`Esc` 不被拦截，保持浏览器/界面原有行为。
 
+### 4. `Ctrl+U` 清空光标前内容
+
+- 焦点在输入框时，按 `Ctrl+U` 删除**光标之前的所有文本**（终端里 readline 的 unix-line-discard 习惯）。
+- 多行输入框同样适用：一次清掉光标前的全部内容（不限于当前行），适合推翻半截 prompt 重写。
+- 不拦截 `Cmd+U`（macOS 上留给浏览器的"查看源代码"）。
+
 ## 安装
 
 ### 1. 安装到 web profile
@@ -69,7 +75,7 @@ dsh-ergonomics/
 ├── LICENSE
 └── lib/
     ├── index.js    # Host 半区：注册 /new 命令（ESM 插件对象）
-    └── client.js   # Client 半区：↑↓ 历史 + /new 跳转 + Esc 中断生成（web 模块加载器 bundle）
+    └── client.js   # Client 半区：↑↓ 历史 + /new 跳转 + Ctrl+U 清空 + Esc 中断生成（web 模块加载器 bundle）
 ```
 
 ## 工作原理
@@ -79,6 +85,7 @@ dsh-ergonomics/
   - 监听输入框的 `↑`/`↓`，按会话维护历史（最多 50 条）。
   - 在 `/new` 命令卡片渲染时调用 `workspaces.startSession()`，完成真正的新建并切换会话。
   - 在输入框聚焦、且会话正在生成时监听 `Esc`，通过 `sessions.binding(sessionId).session.cancel()` 中断当前生成。
+  - 在输入框聚焦时监听 `Ctrl+U`，删除光标前的全部文本并把光标移到开头。
 
 ### 包的加载约定
 
