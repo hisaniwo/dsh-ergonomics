@@ -1,7 +1,7 @@
 {
   "name": "dsh-ergonomics",
-  "version": "0.1.2",
-  "description": "DSH 会话人体工学：/new 一键新会话 + 输入历史 ↑↓ 回溯 + Ctrl+C 终止会话",
+  "version": "0.2.0",
+  "description": "DSH 会话人体工学：/new 一键新会话 + 输入历史 ↑↓ 回溯 + Esc 中断生成",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
